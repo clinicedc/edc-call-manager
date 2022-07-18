@@ -1,6 +1,3 @@
-include AUTHORS CHANGES README.md LICENCE
-recursive-include edc_call_manager/templates *
-recursive-include edc_call_manager/static *
-recursive-exclude edc_call_manager_example/*
-recursive-exclude edc_call_manager_example2/*
-recursive-exclude etc/*
+include AUTHORS CHANGES LICENSE VERSION
+include MANIFEST.in
+include *.rst

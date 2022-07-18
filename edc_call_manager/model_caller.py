@@ -1,216 +1,226 @@
-from datetime import date
+from datetime import date, datetime
+from typing import Any
+
 from dateutil.relativedelta import relativedelta
-
 from django.apps import apps as django_apps
-from django.core.exceptions import MultipleObjectsReturned, ImproperlyConfigured, ValidationError
+from django.core.exceptions import (
+    ImproperlyConfigured,
+    MultipleObjectsReturned,
+    ObjectDoesNotExist,
+    ValidationError,
+)
 from django.utils.text import slugify
+from edc_constants.constants import CLOSED, DEAD, NO, YES
+from edc_utils import get_utcnow
+from tqdm import tqdm
 
-from edc_base.utils import get_utcnow
-from edc_constants.constants import CLOSED, YES, DEAD, NO
-
-from .constants import DAILY, WEEKLY, MONTHLY, YEARLY, OPEN_CALL, NEW_CALL
-from .exceptions import ModelCallerError
-
-app_config = django_apps.get_app_config('edc_call_manager')
+from .constants import DAILY, MONTHLY, NEW_CALL, OPEN_CALL, WEEKLY, YEARLY
 
 
 class ModelCaller:
-    """A class that manages scheduling and unscheduling of calls to subjects based on the
-    creation of given models.
+    """A class that manages scheduling and unscheduling of subject calls.
 
-    This class gets registered to site_model_callers and the activity of it's Scheduling and Unscheduling
-    models is inspected in signals.
-
+    This class gets registered to site_model_callers and the
+    activity of it's Scheduling and Unscheduling models is inspected
+    in signals.
     """
+
     consent_model = None
-    interval = None
+    consent_model_key_field = "subject_identifier"
+    interval = WEEKLY
     label = None
-    locator_filter = 'subject_identifier'
-    locator_model = None
+    locator_model = "edc_locator.subjectlocator"
     repeat_times = 0
-    subject_model = None  # model with PII attrs. Default: RegisteredSubject
+    subject_model = "edc_registration.registeredsubject"  # model with PII attrs. Default: RegisteredSubject
+    subject_model_key_field = "subject_identifier"
     verbose_name = None
+    call_model = "edc_call_manager.call"
+    log_model = "edc_call_manager.log"
+    log_entry_model = "edc_call_manager.logentry"
+    # intervals = [DAILY, WEEKLY, MONTHLY, YEARLY]
 
     def __init__(self, start_model, stop_model):
-        self.consent_model_fk = None
+        self.call_model_cls = django_apps.get_model(self.call_model)
+        self.log_model_cls = django_apps.get_model(self.log_model)
+        self.log_entry_model_cls = django_apps.get_model(self.log_entry_model)
         self.start_model = start_model
-        self.start_model_name = start_model._meta.label
-        self.stop_model = stop_model
-        if self.stop_model:
-            self.stop_model_name = stop_model._meta.label
-        try:
-            self.call_model = django_apps.get_model(
-                app_config.app_label, 'call')
-            self.log_model = django_apps.get_model(app_config.app_label, 'log')
-            self.log_entry_model = django_apps.get_model(
-                app_config.app_label, 'logentry')
-        except LookupError as e:
-            raise ModelCallerError('{} Try setting \'app_label\' to the app where the model is declared '
-                                   'in AppConfig'.format(str(e), self.__class__.__name__))
-        if not self.subject_model:
+        self.start_model_cls = django_apps.get_model(self.start_model)
+        self.stop_model_cls = None if not stop_model else django_apps.get_model(stop_model)
+        self.consent_model_cls = (
+            None if not self.consent_model else django_apps.get_model(self.consent_model)
+        )
+        self.locator_model_cls = django_apps.get_model(self.locator_model)
+        self.subject_model_cls = django_apps.get_model(self.subject_model)
+        if self.consent_model_cls:
+            if not [
+                fld.name
+                for fld in self.consent_model_cls._meta.fields
+                if fld.name in [self.consent_model_key_field]
+            ]:
+                raise ImproperlyConfigured(
+                    f"ModelCaller model '{self.consent_model_cls._meta.label_lower}."
+                    f"does not have field '{self.consent_model_key_field}'. "
+                    f"See {self.__class__.__name__}.consent_model_fk."
+                )
+        self.label = slugify(self.label or self.__class__.__name__)
+        # if self.interval and self.interval not in self.intervals:
+        #     raise ValueError(
+        #         "ModelCaller expected an 'interval' for a call scheduled to repeat. "
+        #         f"Expected one of {', '.join(self.intervals)}. Got {self.interval}."
+        #     )
+        self.repeats = True if self.stop_model_cls and self.repeat_times > 0 else False
+
+    @property
+    def start_model_options(self) -> dict:
+        """Override"""
+        return {}
+
+    def call_datetime(self, start_model_obj: Any) -> datetime:
+        """Override"""
+        return get_utcnow()
+
+    def schedule_calls(self) -> int:
+        """Creates a new call instance for each instance in the
+        start model queryset.
+
+        A new call is not created if one already exists.
+        """
+        new_calls = 0
+        total = self.start_model_cls.objects.filter(**self.start_model_options).count()
+        for start_model_obj in tqdm(
+            self.start_model_cls.objects.filter(**self.start_model_options), total=total
+        ):
             try:
-                self.subject_model = django_apps.get_app_config('edc_registration').get_model(
-                    'RegisteredSubject')
-            except LookupError as e:
-                raise ModelCallerError(
-                    'Cannot determine subject_model. Got {}'.format(str(e)))
-        self.subject_model_name = self.subject_model._meta.label
-        try:
-            self.consent_model, self.consent_model_fk = self.consent_model
-        except TypeError:
-            pass
-        try:
-            self.locator_model, self.locator_filter = self.locator_model
-        except TypeError:
-            pass
-        self.locator_model_name = self.locator_model._meta.label
-        if self.consent_model and self.consent_model_fk:
-            if not [fld.name for fld in self.consent_model._meta.fields if fld.name in [self.consent_model_fk]]:
-                raise ImproperlyConfigured(
-                    'ModelCaller model \'{}.{}\' does not have field \'{}\'. See {} declaration for '
-                    'attribute consent_model_fk.'.format(
-                        self.consent_model._meta.app_label, self.consent_model._meta.model_name,
-                        self.consent_model_fk,
-                        self.__class__.__name__))
-        for attr in ['locator_model', 'call_model', 'log_model', 'log_entry_model']:
-            value = getattr(self, attr)
-            if not value:
-                raise ImproperlyConfigured(
-                    'Attribute {0}.{1} cannot be None. See {0} declaration.'.format(
-                        self.__class__.__name__, attr))
+                self.call_model_cls.objects.get(
+                    subject_identifier=start_model_obj.subject_identifier,
+                    label=self.label,
+                    call_status__in=[NEW_CALL, OPEN_CALL],
+                )
+            except ObjectDoesNotExist:
+                self.create_call_and_log(start_model_obj)
+                new_calls += 1
+        return new_calls
+
+    def create_call_and_log(self, start_model_obj):
+        """Creates a call model instance and the corresponding
+        Log model instance.
+        """
         if self.consent_model:
-            self.consent_model_name = self.consent_model._meta.label
-        label = self.label or self.__class__.__name__
-        self.label = slugify(str(label))
-        if self.interval not in [DAILY, WEEKLY, MONTHLY, YEARLY, None]:
-            raise ValueError(
-                'ModelCaller expected an \'interval\' for a call scheduled to repeat. Got None.')
-        self.repeats = False
-        if self.stop_model:
-            if self.repeat_times > 0 or self.interval:
-                self.repeats = True
+            options = self.pii(start_model_obj)
+        else:
+            options = self.pii(start_model_obj)
+        call = self.call_model_cls.objects.create(
+            scheduled=self.call_datetime(start_model_obj),
+            label=self.label,
+            repeats=self.repeats,
+            **options,
+        )
+        self.log_model_cls.objects.create(
+            call=call,
+            locator_information=self.locator_to_str(start_model_obj.subject_identifier),
+        )
 
-    def personal_details_from_subject(self, instance):
-        """Returns additional options from the subject model to be used to create a Call instance.
+    def close_and_create_next(self, subject_identifier: str) -> None:
+        pass
 
-        Used if the consent is not available."""
+    def close_all_calls(self, subject_identifier: str) -> None:
+        """Sets call as closed for this subject identifier"""
+        self.call_model_cls.objects.filter(
+            subject_identifier=subject_identifier, label=self.label
+        ).exclude(call_status=CLOSED).update(call_status=CLOSED, auto_closed=True)
+
+    # def schedule_next_call(self, call, scheduled_date=None):
+    #     """Schedules the next call if either scheduled_date is
+    #     provided or can be calculated.
+    #     """
+    #     scheduled_date = scheduled_date or self.get_next_scheduled_date(call.call_datetime)
+    #     if scheduled_date:
+    #         self.create_call_and_log(call, scheduled=scheduled_date)
+
+    def pii(self, instance) -> dict:
+        """Returns personal details (PII) for this subject"""
         subject = self.subject(instance.subject_identifier)
-        options = {'subject_identifier': subject.subject_identifier,
-                   'first_name': subject.first_name,
-                   'initials': subject.initials}
-        return options
-
-    def personal_details_from_consent(self, instance):
-        """Returns additional options from the consent model to be used to create a Call instance.
-
-        You should use the edc_consent RequiresConsentMixin on the scheduling and unscheduling models to
-        avoid hitting the ValueError below when the subject is not consented."""
-        consent = self.consent(instance.subject_identifier)
-        options = {'subject_identifier': consent.subject_identifier,
-                   'first_name': consent.first_name,
-                   'initials': consent.initials}
-        try:
-            consent_foreignkey = getattr(consent, self.consent_model_fk)
-            options.update({self.consent_model_fk: consent_foreignkey})
-        except AttributeError:
-            pass
+        options = {
+            "subject_identifier": subject.subject_identifier,
+            "first_name": subject.first_name,
+            "initials": subject.initials,
+        }
+        if self.consent_model_key_field not in options:
+            try:
+                value = getattr(instance, self.consent_model_key_field)
+            except AttributeError:
+                pass
+            else:
+                options.update({self.consent_model_key_field: value})
         return options
 
     def subject(self, subject_identifier):
-        """Return an instance of the subject model."""
-        subject = None
-        if self.subject_model:
-            subject = self.subject_model.objects.get(
-                subject_identifier=subject_identifier)
-        return subject
+        """Return an instance of the subject model"""
+
+        return self.subject_model_cls.objects.get(
+            **{self.subject_model_key_field: subject_identifier}
+        )
 
     def consent(self, subject_identifier):
-        """Return an instance of the consent model or None."""
+        """Return an instance of the consent model or None"""
         consent = None
-        if self.consent_model:
+        if self.consent_model_cls:
             try:
-                consent = self.consent_model.objects.get(
-                    subject_identifier=subject_identifier)
+                # TODO: shouldn't this be filtered for schedule
+                consent = self.consent_model_cls.objects.get(
+                    subject_identifier=subject_identifier
+                )
             except MultipleObjectsReturned:
-                consent = self.consent_model.consent.consent_for_period(
-                    subject_identifier, get_utcnow())
-            except self.consent_model.DoesNotExist as e:
+                consent = self.consent_model_cls.consent.consent_for_period(
+                    subject_identifier, get_utcnow()
+                )
+            except ObjectDoesNotExist as e:
                 raise ValueError(
-                    'ModelCaller \'{}\' is configured to require a consent for subject \'{}\'. '
-                    'Got \'{}\''.format(self.label, subject_identifier, str(e)))
+                    f"ModelCaller '{self.label}' is configured to require a consent "
+                    f"for subject '{subject_identifier}'. Got '{e}'"
+                )
         return consent
 
-    def schedule_call(self, instance, scheduled=None):
-        """Schedules a call by creating a new call instance and creates the corresponding Log instance.
-
-        `instance` is a start_model instance"""
-        if self.consent_model:
-            options = self.personal_details_from_consent(instance)
-        else:
-            options = self.personal_details_from_subject(instance)
-        call = self.call_model.objects.create(
-            scheduled=scheduled or date.today(),
-            label=self.label,
-            repeats=self.repeats,
-            **options)
-        self.log_model.objects.create(
-            call=call,
-            locator_information=self.get_locator(instance))
-
-    def unschedule_call(self, subject_identifier):
-        """Unschedules any calls for this subject and model caller.
-
-        `instance` is a stop_model instance"""
-        self.call_model.objects.filter(
-            subject_identifier=subject_identifier,
-            label=self.label).exclude(
-                call_status=CLOSED).update(
-                    call_status=CLOSED,
-                    auto_closed=True)
-
-    def schedule_next_call(self, call, scheduled_date=None):
-        """Schedules the next call if either scheduled_date is provided or can be calculated."""
-        scheduled_date = scheduled_date or self.get_next_scheduled_date(
-            call.call_datetime)
-        if scheduled_date:
-            self.schedule_call(call, scheduled_date)
-
-    def get_next_scheduled_date(self, reference_date):
-        """Returns the next scheduled date or None based on the interval.
-
-        TODO: This needs to be a bit more sophisticated to avoid holidays, weekends, etc."""
+    def get_next_scheduled_date(self, reference_date) -> date:
+        """Returns the next scheduled date or None based on the
+        interval.
+        """
+        # TODO: This needs to be a bit more sophisticated to
+        #  avoid holidays, weekends, etc.
         scheduled_date = None
         if self.interval == DAILY:
             scheduled_date = reference_date + relativedelta(days=+1)
         elif self.interval == WEEKLY:
-            scheduled_date = reference_date + \
-                relativedelta(days=+1, weekday=reference_date.weekday())
+            scheduled_date = reference_date + relativedelta(
+                days=+1, weekday=reference_date.weekday()
+            )
         elif self.interval == MONTHLY:
-            scheduled_date = reference_date + \
-                relativedelta(months=+1, weekday=reference_date.weekday())
+            scheduled_date = reference_date + relativedelta(
+                months=+1, weekday=reference_date.weekday()
+            )
         else:
             pass
         return scheduled_date
 
-    def update_call_from_log(self, call, log_entry, commit=True):
-        """Updates the call_model instance with information from the log entry
-        for this subject and model caller.
+    def update_call_from_log(self, call, log_entry, commit=True) -> None:
+        """Updates the call_model instance with information from the
+        log entry for this subject and model caller.
 
-        Only updates call if this is the most recent log_entry."""
-        log_entries = self.log_entry_model.objects.filter(
-            log=log_entry.log).order_by('-call_datetime')
+        Only updates call if this is the most recent log_entry.
+        """
+        log_entries = self.log_entry_model_cls.objects.filter(log=log_entry.log).order_by(
+            "-call_datetime"
+        )
         if log_entry.pk == log_entries[0].pk:
-            call = self.call_model.objects.get(pk=call.pk)
+            call = self.call_model_cls.objects.get(pk=call.pk)
             if call.call_status == CLOSED:
-                raise ValidationError(
-                    'Call is closed. Perhaps catch this in the form.')
-            call.call_outcome = '. '.join(log_entry.outcome)
+                raise ValidationError("Call is closed. Perhaps catch this in the form.")
+            call.call_outcome = ". ".join(log_entry.outcome)
             call.call_datetime = log_entry.call_datetime
             call.call_attempts = log_entries.count()
             if log_entry.may_call == NO or log_entry.survival_status == DEAD:
                 if log_entry.survival_status == DEAD:
-                    call.call_outcome = 'Deceased. ' + \
-                        (call.call_outcome or '')
+                    call.call_outcome = "Deceased. " + (call.call_outcome or "")
                 call.call_status = CLOSED
             else:
                 call.call_status = OPEN_CALL
@@ -221,31 +231,15 @@ class ModelCaller:
             if commit:
                 call.save()
 
-    def appointment_handler(self, call, log_entry):
-        """Called by LogEntry post_save signal."""
-        if self.appointment_model:
-            self.appointment_model.objects.create(
-                appt_date=log_entry.appt_date,
-                appt_location=log_entry.appt_location,
-                appt_status=NEW_CALL,
-            )
-
-    def get_locator(self, instance):
-        """Returns the locator instance as a formatted string."""
-        locator = ''
-        if self.locator_model:
-            locator_filter = self.locator_filter or 'subject_identifier'
-            options = {locator_filter: instance.subject_identifier}
-            try:
-                locator = self.locator_model.objects.get(**options)
-                locator = locator.to_string()
-            except self.locator_model.DoesNotExist:
-                locator = 'locator not found.'
-        return locator
-
-    def get_value(self, instance, attr):
+    def locator_to_str(self, subject_identifier: str) -> str:
+        """Returns the locator instance as a formatted string"""
         try:
-            value = getattr(instance, attr)
-        except AttributeError:
-            value = None
-        return value
+            locator = self.locator_model_cls.objects.get(subject_identifier=subject_identifier)
+        except ObjectDoesNotExist:
+            locator_as_str = "locator not found."
+        else:
+            locator_as_str = self.to_string(locator)
+        return locator_as_str
+
+    def to_string(self, obj):
+        return ", ".join([str(v) for k, v in obj.__dict__.items() if not k.startswith("_")])

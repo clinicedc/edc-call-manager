@@ -5,8 +5,8 @@ from edc_call_manager.apps import AppConfig as EdcCallManagerAppConfigParent
 
 
 class AppConfig(DjangoAppConfig):
-    name = 'example'
-    verbose_name = 'Example App'
+    name = "example"
+    verbose_name = "Example App"
 
 
 class EdcBaseAppConfig(EdcBaseAppConfigParent):
@@ -14,4 +14,4 @@ class EdcBaseAppConfig(EdcBaseAppConfigParent):
 
 
 class EdcCallManagerAppConfig(EdcCallManagerAppConfigParent):
-    app_label = 'example'
+    app_label = "example"
