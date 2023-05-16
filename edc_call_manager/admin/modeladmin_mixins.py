@@ -2,11 +2,11 @@ from django.apps import apps as django_apps
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.safestring import mark_safe
-from edc_model_admin import (
-    ChangelistButtonModelAdminMixin,
+from edc_model_admin.changelist_buttons import ChangelistButtonModelAdminMixin
+from edc_model_admin.history import SimpleHistoryAdmin
+from edc_model_admin.mixins import (
     ModelAdminFormAutoNumberMixin,
     ModelAdminFormInstructionsMixin,
-    SimpleHistoryAdmin,
 )
 
 from ..constants import NEW_CALL, OPEN_CALL

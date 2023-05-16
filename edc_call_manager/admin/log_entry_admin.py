@@ -1,7 +1,7 @@
 from django.contrib import admin
-from django.contrib.admin.options import InlineModelAdmin
-from edc_model_admin import SimpleHistoryAdmin, StackedInlineModelAdminMixin
 from edc_model_admin.dashboard import ModelAdminSubjectDashboardMixin
+from edc_model_admin.history import SimpleHistoryAdmin
+from edc_model_admin.mixins import StackedInlineModelAdminMixin
 
 from ..admin_site import edc_call_manager_admin
 from ..forms import LogEntryForm
