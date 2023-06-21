@@ -1,7 +1,6 @@
-from edc_constants.constants import YES, NO, DWTA, OTHER
+from edc_constants.constants import CLINIC, DWTA, HOME, NO, OTHER, TELEPHONE, YES
 
-from .constants import NO_CONTACT, DIRECT_CONTACT, INDIRECT_CONTACT
-
+from .constants import DIRECT_CONTACT, INDIRECT_CONTACT, NO_CONTACT
 
 CONTACT_TYPE = (
     (DIRECT_CONTACT, "Direct contact with participant"),
@@ -10,11 +9,11 @@ CONTACT_TYPE = (
 )
 
 APPT_LOCATIONS = (
-    ("home", "At home"),
+    (HOME, "At home"),
     ("work", "At work"),
-    ("telephone", "By telephone"),
-    ("clinic", "At clinic"),
-    ("OTHER", "Other location"),
+    (TELEPHONE, "By telephone"),
+    (CLINIC, "At clinic"),
+    (OTHER, "Other location"),
 )
 
 
