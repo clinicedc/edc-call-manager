@@ -1,13 +1,13 @@
 from django.db import models
 from django.utils import timezone
-
 from edc_base.model.models import BaseUuidModel, HistoricalRecords
+from edc_locator.model_mixins import LocatorModelMixin
+
 from edc_call_manager.model_mixins import (
     CallModelMixin,
-    LogModelMixin,
     LogEntryModelMixin,
+    LogModelMixin,
 )
-from edc_locator.model_mixins import LocatorModelMixin
 
 
 class TestModel(BaseUuidModel):

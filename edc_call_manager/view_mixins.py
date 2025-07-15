@@ -5,15 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from edc_dashboard.view_mixins import EdcViewMixin
-
-from edc_utils import formatted_age
-from edc_call_manager.constants import NO_CONTACT, INDIRECT_CONTACT, DIRECT_CONTACT
 from edc_constants.constants import ALIVE, CLOSED, NO
+from edc_dashboard.view_mixins import EdcViewMixin
+from edc_utils import formatted_age
+
+from edc_call_manager.constants import DIRECT_CONTACT, INDIRECT_CONTACT, NO_CONTACT
 
 from .caller_site import site_model_callers
 from .forms import LogEntryForm
-
 
 app_config = django_apps.get_app_config("edc_call_manager")
 Call = django_apps.get_model(app_config.app_label, "call")
@@ -53,11 +52,7 @@ class CallSubjectViewMixin(EdcViewMixin):
         call_status = self.log.call.get_call_status_display()
         if app_config.verbose_name not in context.get("project_name"):
             context.update(
-                {
-                    "project_name": context.get("project_name")
-                    + ": "
-                    + app_config.verbose_name
-                }
+                {"project_name": context.get("project_name") + ": " + app_config.verbose_name}
             )
         context.update(
             instructions=self.instructions,

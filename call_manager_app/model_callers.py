@@ -1,6 +1,7 @@
+from edc_registration.models import RegisteredSubject
+
 from edc_call_manager.decorators import register
 from edc_call_manager.model_caller import ModelCaller
-from edc_registration.models import RegisteredSubject
 
 from .models import Locator, TestModel, TestStartModel, TestStopModel
 

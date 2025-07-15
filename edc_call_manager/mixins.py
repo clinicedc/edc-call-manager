@@ -6,7 +6,6 @@ app_config = django_apps.get_app_config("edc_call_manager")
 
 
 class CallLogLocatorMixin(models.Model):
-
     """A Locator model mixin that has the Locator model update the Log if changed."""
 
     def save(self, *args, **kwargs):

@@ -1,6 +1,6 @@
 from django.apps import AppConfig as DjangoAppConfig
-
 from edc_base.apps import AppConfig as EdcBaseAppConfigParent
+
 from edc_call_manager.apps import AppConfig as EdcCallManagerAppConfigParent
 
 

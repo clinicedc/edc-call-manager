@@ -1,8 +1,8 @@
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic.base import RedirectView
-
 from edc_base.views import LoginView, LogoutView
+
 from edc_call_manager.admin import edc_call_manager_admin
 
 from .views import HomeView

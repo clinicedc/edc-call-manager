@@ -31,214 +31,1102 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Call',
+            name="Call",
             fields=[
-                ('revision', django_revision.revision_field.RevisionField(blank=True, editable=False, help_text='System field. Git repository tag:branch:commit.', max_length=75, null=True, verbose_name='Revision')),
-                ('created', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('modified', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('user_created', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user created')),
-                ('user_modified', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user modified')),
-                ('hostname_created', models.CharField(blank=True, default=_socket.gethostname, help_text='System field. (modified on create only)', max_length=60)),
-                ('hostname_modified', django_audit_fields.fields.hostname_modification_field.HostnameModificationField(blank=True, help_text='System field. (modified on every save)', max_length=50)),
-                ('device_created', models.CharField(blank=True, max_length=10)),
-                ('device_modified', models.CharField(blank=True, max_length=10)),
-                ('id', django_audit_fields.fields.uuid_auto_field.UUIDAutoField(blank=True, editable=False, help_text='System auto field. UUID primary key.', primary_key=True, serialize=False)),
-                ('subject_identifier', models.CharField(max_length=50)),
-                ('label', models.CharField(max_length=50)),
-                ('scheduled', models.DateField(default=datetime.date.today)),
-                ('repeats', models.BooleanField(default=False)),
-                ('call_datetime', models.DateTimeField(editable=False, help_text='last call datetime updated by call log entry', null=True)),
-                ('first_name', django_crypto_fields.fields.firstname_field.FirstnameField(blank=True, editable=False, help_text=' (Encryption: RSA local)', max_length=71, null=True, verbose_name='First name')),
-                ('initials', models.CharField(editable=False, max_length=3, null=True, verbose_name='Initials')),
-                ('consent_datetime', models.DateTimeField(help_text='From Subject Consent.', null=True, validators=[edc_protocol.validators.datetime_not_before_study_start, edc_model.validators.date.datetime_not_future], verbose_name='Consent date and time')),
-                ('call_attempts', models.IntegerField(default=0)),
-                ('call_outcome', models.TextField(max_length=150, null=True)),
-                ('call_status', models.CharField(choices=[('NEW', 'New'), ('open', 'Open'), ('closed', 'Closed')], default='NEW', max_length=15)),
-                ('auto_closed', models.BooleanField(default=False, editable=False, help_text='If True call status was changed to CLOSED by EDC.')),
+                (
+                    "revision",
+                    django_revision.revision_field.RevisionField(
+                        blank=True,
+                        editable=False,
+                        help_text="System field. Git repository tag:branch:commit.",
+                        max_length=75,
+                        null=True,
+                        verbose_name="Revision",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "user_created",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user created",
+                    ),
+                ),
+                (
+                    "user_modified",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user modified",
+                    ),
+                ),
+                (
+                    "hostname_created",
+                    models.CharField(
+                        blank=True,
+                        default=_socket.gethostname,
+                        help_text="System field. (modified on create only)",
+                        max_length=60,
+                    ),
+                ),
+                (
+                    "hostname_modified",
+                    django_audit_fields.fields.hostname_modification_field.HostnameModificationField(
+                        blank=True,
+                        help_text="System field. (modified on every save)",
+                        max_length=50,
+                    ),
+                ),
+                ("device_created", models.CharField(blank=True, max_length=10)),
+                ("device_modified", models.CharField(blank=True, max_length=10)),
+                (
+                    "id",
+                    django_audit_fields.fields.uuid_auto_field.UUIDAutoField(
+                        blank=True,
+                        editable=False,
+                        help_text="System auto field. UUID primary key.",
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("subject_identifier", models.CharField(max_length=50)),
+                ("label", models.CharField(max_length=50)),
+                ("scheduled", models.DateField(default=datetime.date.today)),
+                ("repeats", models.BooleanField(default=False)),
+                (
+                    "call_datetime",
+                    models.DateTimeField(
+                        editable=False,
+                        help_text="last call datetime updated by call log entry",
+                        null=True,
+                    ),
+                ),
+                (
+                    "first_name",
+                    django_crypto_fields.fields.firstname_field.FirstnameField(
+                        blank=True,
+                        editable=False,
+                        help_text=" (Encryption: RSA local)",
+                        max_length=71,
+                        null=True,
+                        verbose_name="First name",
+                    ),
+                ),
+                (
+                    "initials",
+                    models.CharField(
+                        editable=False, max_length=3, null=True, verbose_name="Initials"
+                    ),
+                ),
+                (
+                    "consent_datetime",
+                    models.DateTimeField(
+                        help_text="From Subject Consent.",
+                        null=True,
+                        validators=[
+                            edc_protocol.validators.datetime_not_before_study_start,
+                            edc_model.validators.date.datetime_not_future,
+                        ],
+                        verbose_name="Consent date and time",
+                    ),
+                ),
+                ("call_attempts", models.IntegerField(default=0)),
+                ("call_outcome", models.TextField(max_length=150, null=True)),
+                (
+                    "call_status",
+                    models.CharField(
+                        choices=[("NEW", "New"), ("open", "Open"), ("closed", "Closed")],
+                        default="NEW",
+                        max_length=15,
+                    ),
+                ),
+                (
+                    "auto_closed",
+                    models.BooleanField(
+                        default=False,
+                        editable=False,
+                        help_text="If True call status was changed to CLOSED by EDC.",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Call',
-                'verbose_name_plural': 'Calls',
-                'abstract': False,
-                'unique_together': {('subject_identifier', 'label', 'scheduled')},
+                "verbose_name": "Call",
+                "verbose_name_plural": "Calls",
+                "abstract": False,
+                "unique_together": {("subject_identifier", "label", "scheduled")},
             },
         ),
         migrations.CreateModel(
-            name='Log',
+            name="Log",
             fields=[
-                ('revision', django_revision.revision_field.RevisionField(blank=True, editable=False, help_text='System field. Git repository tag:branch:commit.', max_length=75, null=True, verbose_name='Revision')),
-                ('created', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('modified', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('user_created', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user created')),
-                ('user_modified', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user modified')),
-                ('hostname_created', models.CharField(blank=True, default=_socket.gethostname, help_text='System field. (modified on create only)', max_length=60)),
-                ('hostname_modified', django_audit_fields.fields.hostname_modification_field.HostnameModificationField(blank=True, help_text='System field. (modified on every save)', max_length=50)),
-                ('device_created', models.CharField(blank=True, max_length=10)),
-                ('device_modified', models.CharField(blank=True, max_length=10)),
-                ('id', django_audit_fields.fields.uuid_auto_field.UUIDAutoField(blank=True, editable=False, help_text='System auto field. UUID primary key.', primary_key=True, serialize=False)),
-                ('log_datetime', models.DateTimeField(default=django.utils.timezone.now, editable=False)),
-                ('locator_information', django_crypto_fields.fields.encrypted_text_field.EncryptedTextField(blank=True, help_text='This information has been imported from the previous locator. You may update as required. (Encryption: AES local)', max_length=71, null=True)),
-                ('contact_notes', django_crypto_fields.fields.encrypted_text_field.EncryptedTextField(blank=True, help_text=' (Encryption: AES local)', max_length=71, null=True)),
-                ('call', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='edc_call_manager.call')),
+                (
+                    "revision",
+                    django_revision.revision_field.RevisionField(
+                        blank=True,
+                        editable=False,
+                        help_text="System field. Git repository tag:branch:commit.",
+                        max_length=75,
+                        null=True,
+                        verbose_name="Revision",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "user_created",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user created",
+                    ),
+                ),
+                (
+                    "user_modified",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user modified",
+                    ),
+                ),
+                (
+                    "hostname_created",
+                    models.CharField(
+                        blank=True,
+                        default=_socket.gethostname,
+                        help_text="System field. (modified on create only)",
+                        max_length=60,
+                    ),
+                ),
+                (
+                    "hostname_modified",
+                    django_audit_fields.fields.hostname_modification_field.HostnameModificationField(
+                        blank=True,
+                        help_text="System field. (modified on every save)",
+                        max_length=50,
+                    ),
+                ),
+                ("device_created", models.CharField(blank=True, max_length=10)),
+                ("device_modified", models.CharField(blank=True, max_length=10)),
+                (
+                    "id",
+                    django_audit_fields.fields.uuid_auto_field.UUIDAutoField(
+                        blank=True,
+                        editable=False,
+                        help_text="System auto field. UUID primary key.",
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "log_datetime",
+                    models.DateTimeField(default=django.utils.timezone.now, editable=False),
+                ),
+                (
+                    "locator_information",
+                    django_crypto_fields.fields.encrypted_text_field.EncryptedTextField(
+                        blank=True,
+                        help_text="This information has been imported from the previous locator. You may update as required. (Encryption: AES local)",
+                        max_length=71,
+                        null=True,
+                    ),
+                ),
+                (
+                    "contact_notes",
+                    django_crypto_fields.fields.encrypted_text_field.EncryptedTextField(
+                        blank=True,
+                        help_text=" (Encryption: AES local)",
+                        max_length=71,
+                        null=True,
+                    ),
+                ),
+                (
+                    "call",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="edc_call_manager.call"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Log',
-                'verbose_name_plural': 'Logs',
-                'abstract': False,
-                'unique_together': {('log_datetime', 'call')},
+                "verbose_name": "Log",
+                "verbose_name_plural": "Logs",
+                "abstract": False,
+                "unique_together": {("log_datetime", "call")},
             },
         ),
         migrations.CreateModel(
-            name='HistoricalLogEntry',
+            name="HistoricalLogEntry",
             fields=[
-                ('revision', django_revision.revision_field.RevisionField(blank=True, editable=False, help_text='System field. Git repository tag:branch:commit.', max_length=75, null=True, verbose_name='Revision')),
-                ('created', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('modified', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('user_created', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user created')),
-                ('user_modified', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user modified')),
-                ('hostname_created', models.CharField(blank=True, default=_socket.gethostname, help_text='System field. (modified on create only)', max_length=60)),
-                ('hostname_modified', django_audit_fields.fields.hostname_modification_field.HostnameModificationField(blank=True, help_text='System field. (modified on every save)', max_length=50)),
-                ('device_created', models.CharField(blank=True, max_length=10)),
-                ('device_modified', models.CharField(blank=True, max_length=10)),
-                ('id', django_audit_fields.fields.uuid_auto_field.UUIDAutoField(blank=True, db_index=True, editable=False, help_text='System auto field. UUID primary key.')),
-                ('call_reason', models.CharField(choices=[('schedule_appt', 'Schedule an appointment'), ('reminder', 'Remind participant of scheduled appointment'), ('missed_appt', 'Follow-up with participant on missed appointment')], max_length=25, verbose_name='Reason for this call')),
-                ('call_datetime', models.DateTimeField(verbose_name='Date of this call')),
-                ('contact_type', models.CharField(choices=[('direct', 'Direct contact with participant'), ('indirect', 'Contact with person other than participant'), ('no_contact', 'No contact made')], help_text='If no contact made. STOP. Save form.', max_length=15)),
-                ('survival_status', models.CharField(choices=[('alive', 'Alive'), ('dead', 'Deceased'), ('unknown', 'Unknown')], default='alive', max_length=10, null=True, verbose_name='Survival status of the participant')),
-                ('time_of_week', models.CharField(blank=True, choices=[('weekdays', 'Weekdays'), ('weekends', 'Weekends'), ('anytime', 'Anytime')], max_length=25, null=True, verbose_name='Time of week when participant will be available')),
-                ('time_of_day', models.CharField(blank=True, choices=[('morning', 'Morning'), ('afternoon', 'Afternoon'), ('evening', 'Evening'), ('anytime', 'Anytime')], max_length=25, null=True, verbose_name='Time of day when participant will be available')),
-                ('appt', models.CharField(blank=True, choices=[('Yes', 'Yes'), ('No', 'No')], max_length=7, null=True, verbose_name='Is the participant willing to schedule an appointment')),
-                ('appt_reason_unwilling', models.CharField(blank=True, choices=[('not_interested', 'Not interested in participating'), ('busy', 'Busy during the suggested times'), ('away', 'Out of town during the suggested times'), ('unavailable', 'Not available during the suggested times'), ('DWTA', 'Prefer not to say why I am unwilling.'), ('OTHER', 'Other reason ...')], max_length=25, null=True, verbose_name='What is the reason the participant is unwilling to schedule an appointment')),
-                ('appt_reason_unwilling_other', models.CharField(blank=True, max_length=50, null=True, verbose_name='Other reason, please specify ...')),
-                ('appt_date', models.DateField(blank=True, help_text='This can only come from the participant.', null=True, validators=[edc_model.validators.date.date_is_future], verbose_name='Appointment Date')),
-                ('appt_grading', models.CharField(blank=True, choices=[('firm', 'Firm appointment'), ('weak', 'Possible appointment'), ('guess', 'Estimated by RA')], max_length=25, null=True, verbose_name='Is this appointment...')),
-                ('appt_location', models.CharField(blank=True, choices=[('home', 'At home'), ('work', 'At work'), ('telephone', 'By telephone'), ('clinic', 'At clinic'), ('OTHER', 'Other location')], max_length=50, null=True, verbose_name='Appointment location')),
-                ('appt_location_other', edc_model_fields.fields.other_charfield.OtherCharField(blank=True, max_length=50, null=True, verbose_name='Other location, please specify ...')),
-                ('delivered', models.BooleanField(default=False, editable=False)),
-                ('may_call', models.CharField(blank=True, choices=[('Yes', 'Yes, we may continue to contact the participant.'), ('No', 'No, participant has asked NOT to be contacted again.')], default='Yes', max_length=10, null=True, verbose_name='May we continue to contact the participant?')),
-                ('history_id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField(db_index=True)),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('log', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='edc_call_manager.log')),
+                (
+                    "revision",
+                    django_revision.revision_field.RevisionField(
+                        blank=True,
+                        editable=False,
+                        help_text="System field. Git repository tag:branch:commit.",
+                        max_length=75,
+                        null=True,
+                        verbose_name="Revision",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "user_created",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user created",
+                    ),
+                ),
+                (
+                    "user_modified",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user modified",
+                    ),
+                ),
+                (
+                    "hostname_created",
+                    models.CharField(
+                        blank=True,
+                        default=_socket.gethostname,
+                        help_text="System field. (modified on create only)",
+                        max_length=60,
+                    ),
+                ),
+                (
+                    "hostname_modified",
+                    django_audit_fields.fields.hostname_modification_field.HostnameModificationField(
+                        blank=True,
+                        help_text="System field. (modified on every save)",
+                        max_length=50,
+                    ),
+                ),
+                ("device_created", models.CharField(blank=True, max_length=10)),
+                ("device_modified", models.CharField(blank=True, max_length=10)),
+                (
+                    "id",
+                    django_audit_fields.fields.uuid_auto_field.UUIDAutoField(
+                        blank=True,
+                        db_index=True,
+                        editable=False,
+                        help_text="System auto field. UUID primary key.",
+                    ),
+                ),
+                (
+                    "call_reason",
+                    models.CharField(
+                        choices=[
+                            ("schedule_appt", "Schedule an appointment"),
+                            ("reminder", "Remind participant of scheduled appointment"),
+                            (
+                                "missed_appt",
+                                "Follow-up with participant on missed appointment",
+                            ),
+                        ],
+                        max_length=25,
+                        verbose_name="Reason for this call",
+                    ),
+                ),
+                ("call_datetime", models.DateTimeField(verbose_name="Date of this call")),
+                (
+                    "contact_type",
+                    models.CharField(
+                        choices=[
+                            ("direct", "Direct contact with participant"),
+                            ("indirect", "Contact with person other than participant"),
+                            ("no_contact", "No contact made"),
+                        ],
+                        help_text="If no contact made. STOP. Save form.",
+                        max_length=15,
+                    ),
+                ),
+                (
+                    "survival_status",
+                    models.CharField(
+                        choices=[
+                            ("alive", "Alive"),
+                            ("dead", "Deceased"),
+                            ("unknown", "Unknown"),
+                        ],
+                        default="alive",
+                        max_length=10,
+                        null=True,
+                        verbose_name="Survival status of the participant",
+                    ),
+                ),
+                (
+                    "time_of_week",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("weekdays", "Weekdays"),
+                            ("weekends", "Weekends"),
+                            ("anytime", "Anytime"),
+                        ],
+                        max_length=25,
+                        null=True,
+                        verbose_name="Time of week when participant will be available",
+                    ),
+                ),
+                (
+                    "time_of_day",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("morning", "Morning"),
+                            ("afternoon", "Afternoon"),
+                            ("evening", "Evening"),
+                            ("anytime", "Anytime"),
+                        ],
+                        max_length=25,
+                        null=True,
+                        verbose_name="Time of day when participant will be available",
+                    ),
+                ),
+                (
+                    "appt",
+                    models.CharField(
+                        blank=True,
+                        choices=[("Yes", "Yes"), ("No", "No")],
+                        max_length=7,
+                        null=True,
+                        verbose_name="Is the participant willing to schedule an appointment",
+                    ),
+                ),
+                (
+                    "appt_reason_unwilling",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("not_interested", "Not interested in participating"),
+                            ("busy", "Busy during the suggested times"),
+                            ("away", "Out of town during the suggested times"),
+                            ("unavailable", "Not available during the suggested times"),
+                            ("DWTA", "Prefer not to say why I am unwilling."),
+                            ("OTHER", "Other reason ..."),
+                        ],
+                        max_length=25,
+                        null=True,
+                        verbose_name="What is the reason the participant is unwilling to schedule an appointment",
+                    ),
+                ),
+                (
+                    "appt_reason_unwilling_other",
+                    models.CharField(
+                        blank=True,
+                        max_length=50,
+                        null=True,
+                        verbose_name="Other reason, please specify ...",
+                    ),
+                ),
+                (
+                    "appt_date",
+                    models.DateField(
+                        blank=True,
+                        help_text="This can only come from the participant.",
+                        null=True,
+                        validators=[edc_model.validators.date.date_is_future],
+                        verbose_name="Appointment Date",
+                    ),
+                ),
+                (
+                    "appt_grading",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("firm", "Firm appointment"),
+                            ("weak", "Possible appointment"),
+                            ("guess", "Estimated by RA"),
+                        ],
+                        max_length=25,
+                        null=True,
+                        verbose_name="Is this appointment...",
+                    ),
+                ),
+                (
+                    "appt_location",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("home", "At home"),
+                            ("work", "At work"),
+                            ("telephone", "By telephone"),
+                            ("clinic", "At clinic"),
+                            ("OTHER", "Other location"),
+                        ],
+                        max_length=50,
+                        null=True,
+                        verbose_name="Appointment location",
+                    ),
+                ),
+                (
+                    "appt_location_other",
+                    edc_model_fields.fields.other_charfield.OtherCharField(
+                        blank=True,
+                        max_length=50,
+                        null=True,
+                        verbose_name="Other location, please specify ...",
+                    ),
+                ),
+                ("delivered", models.BooleanField(default=False, editable=False)),
+                (
+                    "may_call",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("Yes", "Yes, we may continue to contact the participant."),
+                            ("No", "No, participant has asked NOT to be contacted again."),
+                        ],
+                        default="Yes",
+                        max_length=10,
+                        null=True,
+                        verbose_name="May we continue to contact the participant?",
+                    ),
+                ),
+                (
+                    "history_id",
+                    models.UUIDField(
+                        default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
+                ("history_date", models.DateTimeField(db_index=True)),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(
+                        choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "log",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="edc_call_manager.log",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical Log Entry',
-                'verbose_name_plural': 'historical Log Entries',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': ('history_date', 'history_id'),
+                "verbose_name": "historical Log Entry",
+                "verbose_name_plural": "historical Log Entries",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": ("history_date", "history_id"),
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
         migrations.CreateModel(
-            name='HistoricalLog',
+            name="HistoricalLog",
             fields=[
-                ('revision', django_revision.revision_field.RevisionField(blank=True, editable=False, help_text='System field. Git repository tag:branch:commit.', max_length=75, null=True, verbose_name='Revision')),
-                ('created', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('modified', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('user_created', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user created')),
-                ('user_modified', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user modified')),
-                ('hostname_created', models.CharField(blank=True, default=_socket.gethostname, help_text='System field. (modified on create only)', max_length=60)),
-                ('hostname_modified', django_audit_fields.fields.hostname_modification_field.HostnameModificationField(blank=True, help_text='System field. (modified on every save)', max_length=50)),
-                ('device_created', models.CharField(blank=True, max_length=10)),
-                ('device_modified', models.CharField(blank=True, max_length=10)),
-                ('id', django_audit_fields.fields.uuid_auto_field.UUIDAutoField(blank=True, db_index=True, editable=False, help_text='System auto field. UUID primary key.')),
-                ('log_datetime', models.DateTimeField(default=django.utils.timezone.now, editable=False)),
-                ('locator_information', django_crypto_fields.fields.encrypted_text_field.EncryptedTextField(blank=True, help_text='This information has been imported from the previous locator. You may update as required. (Encryption: AES local)', max_length=71, null=True)),
-                ('contact_notes', django_crypto_fields.fields.encrypted_text_field.EncryptedTextField(blank=True, help_text=' (Encryption: AES local)', max_length=71, null=True)),
-                ('history_id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField(db_index=True)),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('call', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='edc_call_manager.call')),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                (
+                    "revision",
+                    django_revision.revision_field.RevisionField(
+                        blank=True,
+                        editable=False,
+                        help_text="System field. Git repository tag:branch:commit.",
+                        max_length=75,
+                        null=True,
+                        verbose_name="Revision",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "user_created",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user created",
+                    ),
+                ),
+                (
+                    "user_modified",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user modified",
+                    ),
+                ),
+                (
+                    "hostname_created",
+                    models.CharField(
+                        blank=True,
+                        default=_socket.gethostname,
+                        help_text="System field. (modified on create only)",
+                        max_length=60,
+                    ),
+                ),
+                (
+                    "hostname_modified",
+                    django_audit_fields.fields.hostname_modification_field.HostnameModificationField(
+                        blank=True,
+                        help_text="System field. (modified on every save)",
+                        max_length=50,
+                    ),
+                ),
+                ("device_created", models.CharField(blank=True, max_length=10)),
+                ("device_modified", models.CharField(blank=True, max_length=10)),
+                (
+                    "id",
+                    django_audit_fields.fields.uuid_auto_field.UUIDAutoField(
+                        blank=True,
+                        db_index=True,
+                        editable=False,
+                        help_text="System auto field. UUID primary key.",
+                    ),
+                ),
+                (
+                    "log_datetime",
+                    models.DateTimeField(default=django.utils.timezone.now, editable=False),
+                ),
+                (
+                    "locator_information",
+                    django_crypto_fields.fields.encrypted_text_field.EncryptedTextField(
+                        blank=True,
+                        help_text="This information has been imported from the previous locator. You may update as required. (Encryption: AES local)",
+                        max_length=71,
+                        null=True,
+                    ),
+                ),
+                (
+                    "contact_notes",
+                    django_crypto_fields.fields.encrypted_text_field.EncryptedTextField(
+                        blank=True,
+                        help_text=" (Encryption: AES local)",
+                        max_length=71,
+                        null=True,
+                    ),
+                ),
+                (
+                    "history_id",
+                    models.UUIDField(
+                        default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
+                ("history_date", models.DateTimeField(db_index=True)),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(
+                        choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "call",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="edc_call_manager.call",
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical Log',
-                'verbose_name_plural': 'historical Logs',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': ('history_date', 'history_id'),
+                "verbose_name": "historical Log",
+                "verbose_name_plural": "historical Logs",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": ("history_date", "history_id"),
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
         migrations.CreateModel(
-            name='HistoricalCall',
+            name="HistoricalCall",
             fields=[
-                ('revision', django_revision.revision_field.RevisionField(blank=True, editable=False, help_text='System field. Git repository tag:branch:commit.', max_length=75, null=True, verbose_name='Revision')),
-                ('created', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('modified', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('user_created', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user created')),
-                ('user_modified', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user modified')),
-                ('hostname_created', models.CharField(blank=True, default=_socket.gethostname, help_text='System field. (modified on create only)', max_length=60)),
-                ('hostname_modified', django_audit_fields.fields.hostname_modification_field.HostnameModificationField(blank=True, help_text='System field. (modified on every save)', max_length=50)),
-                ('device_created', models.CharField(blank=True, max_length=10)),
-                ('device_modified', models.CharField(blank=True, max_length=10)),
-                ('id', django_audit_fields.fields.uuid_auto_field.UUIDAutoField(blank=True, db_index=True, editable=False, help_text='System auto field. UUID primary key.')),
-                ('subject_identifier', models.CharField(max_length=50)),
-                ('label', models.CharField(max_length=50)),
-                ('scheduled', models.DateField(default=datetime.date.today)),
-                ('repeats', models.BooleanField(default=False)),
-                ('call_datetime', models.DateTimeField(editable=False, help_text='last call datetime updated by call log entry', null=True)),
-                ('first_name', django_crypto_fields.fields.firstname_field.FirstnameField(blank=True, editable=False, help_text=' (Encryption: RSA local)', max_length=71, null=True, verbose_name='First name')),
-                ('initials', models.CharField(editable=False, max_length=3, null=True, verbose_name='Initials')),
-                ('consent_datetime', models.DateTimeField(help_text='From Subject Consent.', null=True, validators=[edc_protocol.validators.datetime_not_before_study_start, edc_model.validators.date.datetime_not_future], verbose_name='Consent date and time')),
-                ('call_attempts', models.IntegerField(default=0)),
-                ('call_outcome', models.TextField(max_length=150, null=True)),
-                ('call_status', models.CharField(choices=[('NEW', 'New'), ('open', 'Open'), ('closed', 'Closed')], default='NEW', max_length=15)),
-                ('auto_closed', models.BooleanField(default=False, editable=False, help_text='If True call status was changed to CLOSED by EDC.')),
-                ('history_id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField(db_index=True)),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                (
+                    "revision",
+                    django_revision.revision_field.RevisionField(
+                        blank=True,
+                        editable=False,
+                        help_text="System field. Git repository tag:branch:commit.",
+                        max_length=75,
+                        null=True,
+                        verbose_name="Revision",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "user_created",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user created",
+                    ),
+                ),
+                (
+                    "user_modified",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user modified",
+                    ),
+                ),
+                (
+                    "hostname_created",
+                    models.CharField(
+                        blank=True,
+                        default=_socket.gethostname,
+                        help_text="System field. (modified on create only)",
+                        max_length=60,
+                    ),
+                ),
+                (
+                    "hostname_modified",
+                    django_audit_fields.fields.hostname_modification_field.HostnameModificationField(
+                        blank=True,
+                        help_text="System field. (modified on every save)",
+                        max_length=50,
+                    ),
+                ),
+                ("device_created", models.CharField(blank=True, max_length=10)),
+                ("device_modified", models.CharField(blank=True, max_length=10)),
+                (
+                    "id",
+                    django_audit_fields.fields.uuid_auto_field.UUIDAutoField(
+                        blank=True,
+                        db_index=True,
+                        editable=False,
+                        help_text="System auto field. UUID primary key.",
+                    ),
+                ),
+                ("subject_identifier", models.CharField(max_length=50)),
+                ("label", models.CharField(max_length=50)),
+                ("scheduled", models.DateField(default=datetime.date.today)),
+                ("repeats", models.BooleanField(default=False)),
+                (
+                    "call_datetime",
+                    models.DateTimeField(
+                        editable=False,
+                        help_text="last call datetime updated by call log entry",
+                        null=True,
+                    ),
+                ),
+                (
+                    "first_name",
+                    django_crypto_fields.fields.firstname_field.FirstnameField(
+                        blank=True,
+                        editable=False,
+                        help_text=" (Encryption: RSA local)",
+                        max_length=71,
+                        null=True,
+                        verbose_name="First name",
+                    ),
+                ),
+                (
+                    "initials",
+                    models.CharField(
+                        editable=False, max_length=3, null=True, verbose_name="Initials"
+                    ),
+                ),
+                (
+                    "consent_datetime",
+                    models.DateTimeField(
+                        help_text="From Subject Consent.",
+                        null=True,
+                        validators=[
+                            edc_protocol.validators.datetime_not_before_study_start,
+                            edc_model.validators.date.datetime_not_future,
+                        ],
+                        verbose_name="Consent date and time",
+                    ),
+                ),
+                ("call_attempts", models.IntegerField(default=0)),
+                ("call_outcome", models.TextField(max_length=150, null=True)),
+                (
+                    "call_status",
+                    models.CharField(
+                        choices=[("NEW", "New"), ("open", "Open"), ("closed", "Closed")],
+                        default="NEW",
+                        max_length=15,
+                    ),
+                ),
+                (
+                    "auto_closed",
+                    models.BooleanField(
+                        default=False,
+                        editable=False,
+                        help_text="If True call status was changed to CLOSED by EDC.",
+                    ),
+                ),
+                (
+                    "history_id",
+                    models.UUIDField(
+                        default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
+                ("history_date", models.DateTimeField(db_index=True)),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(
+                        choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical Call',
-                'verbose_name_plural': 'historical Calls',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': ('history_date', 'history_id'),
+                "verbose_name": "historical Call",
+                "verbose_name_plural": "historical Calls",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": ("history_date", "history_id"),
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
         migrations.CreateModel(
-            name='LogEntry',
+            name="LogEntry",
             fields=[
-                ('revision', django_revision.revision_field.RevisionField(blank=True, editable=False, help_text='System field. Git repository tag:branch:commit.', max_length=75, null=True, verbose_name='Revision')),
-                ('created', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('modified', models.DateTimeField(blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow)),
-                ('user_created', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user created')),
-                ('user_modified', django_audit_fields.fields.userfield.UserField(blank=True, help_text='Updated by admin.save_model', max_length=50, verbose_name='user modified')),
-                ('hostname_created', models.CharField(blank=True, default=_socket.gethostname, help_text='System field. (modified on create only)', max_length=60)),
-                ('hostname_modified', django_audit_fields.fields.hostname_modification_field.HostnameModificationField(blank=True, help_text='System field. (modified on every save)', max_length=50)),
-                ('device_created', models.CharField(blank=True, max_length=10)),
-                ('device_modified', models.CharField(blank=True, max_length=10)),
-                ('id', django_audit_fields.fields.uuid_auto_field.UUIDAutoField(blank=True, editable=False, help_text='System auto field. UUID primary key.', primary_key=True, serialize=False)),
-                ('call_reason', models.CharField(choices=[('schedule_appt', 'Schedule an appointment'), ('reminder', 'Remind participant of scheduled appointment'), ('missed_appt', 'Follow-up with participant on missed appointment')], max_length=25, verbose_name='Reason for this call')),
-                ('call_datetime', models.DateTimeField(verbose_name='Date of this call')),
-                ('contact_type', models.CharField(choices=[('direct', 'Direct contact with participant'), ('indirect', 'Contact with person other than participant'), ('no_contact', 'No contact made')], help_text='If no contact made. STOP. Save form.', max_length=15)),
-                ('survival_status', models.CharField(choices=[('alive', 'Alive'), ('dead', 'Deceased'), ('unknown', 'Unknown')], default='alive', max_length=10, null=True, verbose_name='Survival status of the participant')),
-                ('time_of_week', models.CharField(blank=True, choices=[('weekdays', 'Weekdays'), ('weekends', 'Weekends'), ('anytime', 'Anytime')], max_length=25, null=True, verbose_name='Time of week when participant will be available')),
-                ('time_of_day', models.CharField(blank=True, choices=[('morning', 'Morning'), ('afternoon', 'Afternoon'), ('evening', 'Evening'), ('anytime', 'Anytime')], max_length=25, null=True, verbose_name='Time of day when participant will be available')),
-                ('appt', models.CharField(blank=True, choices=[('Yes', 'Yes'), ('No', 'No')], max_length=7, null=True, verbose_name='Is the participant willing to schedule an appointment')),
-                ('appt_reason_unwilling', models.CharField(blank=True, choices=[('not_interested', 'Not interested in participating'), ('busy', 'Busy during the suggested times'), ('away', 'Out of town during the suggested times'), ('unavailable', 'Not available during the suggested times'), ('DWTA', 'Prefer not to say why I am unwilling.'), ('OTHER', 'Other reason ...')], max_length=25, null=True, verbose_name='What is the reason the participant is unwilling to schedule an appointment')),
-                ('appt_reason_unwilling_other', models.CharField(blank=True, max_length=50, null=True, verbose_name='Other reason, please specify ...')),
-                ('appt_date', models.DateField(blank=True, help_text='This can only come from the participant.', null=True, validators=[edc_model.validators.date.date_is_future], verbose_name='Appointment Date')),
-                ('appt_grading', models.CharField(blank=True, choices=[('firm', 'Firm appointment'), ('weak', 'Possible appointment'), ('guess', 'Estimated by RA')], max_length=25, null=True, verbose_name='Is this appointment...')),
-                ('appt_location', models.CharField(blank=True, choices=[('home', 'At home'), ('work', 'At work'), ('telephone', 'By telephone'), ('clinic', 'At clinic'), ('OTHER', 'Other location')], max_length=50, null=True, verbose_name='Appointment location')),
-                ('appt_location_other', edc_model_fields.fields.other_charfield.OtherCharField(blank=True, max_length=50, null=True, verbose_name='Other location, please specify ...')),
-                ('delivered', models.BooleanField(default=False, editable=False)),
-                ('may_call', models.CharField(blank=True, choices=[('Yes', 'Yes, we may continue to contact the participant.'), ('No', 'No, participant has asked NOT to be contacted again.')], default='Yes', max_length=10, null=True, verbose_name='May we continue to contact the participant?')),
-                ('log', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='edc_call_manager.log')),
+                (
+                    "revision",
+                    django_revision.revision_field.RevisionField(
+                        blank=True,
+                        editable=False,
+                        help_text="System field. Git repository tag:branch:commit.",
+                        max_length=75,
+                        null=True,
+                        verbose_name="Revision",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(
+                        blank=True, default=django_audit_fields.models.audit_model_mixin.utcnow
+                    ),
+                ),
+                (
+                    "user_created",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user created",
+                    ),
+                ),
+                (
+                    "user_modified",
+                    django_audit_fields.fields.userfield.UserField(
+                        blank=True,
+                        help_text="Updated by admin.save_model",
+                        max_length=50,
+                        verbose_name="user modified",
+                    ),
+                ),
+                (
+                    "hostname_created",
+                    models.CharField(
+                        blank=True,
+                        default=_socket.gethostname,
+                        help_text="System field. (modified on create only)",
+                        max_length=60,
+                    ),
+                ),
+                (
+                    "hostname_modified",
+                    django_audit_fields.fields.hostname_modification_field.HostnameModificationField(
+                        blank=True,
+                        help_text="System field. (modified on every save)",
+                        max_length=50,
+                    ),
+                ),
+                ("device_created", models.CharField(blank=True, max_length=10)),
+                ("device_modified", models.CharField(blank=True, max_length=10)),
+                (
+                    "id",
+                    django_audit_fields.fields.uuid_auto_field.UUIDAutoField(
+                        blank=True,
+                        editable=False,
+                        help_text="System auto field. UUID primary key.",
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "call_reason",
+                    models.CharField(
+                        choices=[
+                            ("schedule_appt", "Schedule an appointment"),
+                            ("reminder", "Remind participant of scheduled appointment"),
+                            (
+                                "missed_appt",
+                                "Follow-up with participant on missed appointment",
+                            ),
+                        ],
+                        max_length=25,
+                        verbose_name="Reason for this call",
+                    ),
+                ),
+                ("call_datetime", models.DateTimeField(verbose_name="Date of this call")),
+                (
+                    "contact_type",
+                    models.CharField(
+                        choices=[
+                            ("direct", "Direct contact with participant"),
+                            ("indirect", "Contact with person other than participant"),
+                            ("no_contact", "No contact made"),
+                        ],
+                        help_text="If no contact made. STOP. Save form.",
+                        max_length=15,
+                    ),
+                ),
+                (
+                    "survival_status",
+                    models.CharField(
+                        choices=[
+                            ("alive", "Alive"),
+                            ("dead", "Deceased"),
+                            ("unknown", "Unknown"),
+                        ],
+                        default="alive",
+                        max_length=10,
+                        null=True,
+                        verbose_name="Survival status of the participant",
+                    ),
+                ),
+                (
+                    "time_of_week",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("weekdays", "Weekdays"),
+                            ("weekends", "Weekends"),
+                            ("anytime", "Anytime"),
+                        ],
+                        max_length=25,
+                        null=True,
+                        verbose_name="Time of week when participant will be available",
+                    ),
+                ),
+                (
+                    "time_of_day",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("morning", "Morning"),
+                            ("afternoon", "Afternoon"),
+                            ("evening", "Evening"),
+                            ("anytime", "Anytime"),
+                        ],
+                        max_length=25,
+                        null=True,
+                        verbose_name="Time of day when participant will be available",
+                    ),
+                ),
+                (
+                    "appt",
+                    models.CharField(
+                        blank=True,
+                        choices=[("Yes", "Yes"), ("No", "No")],
+                        max_length=7,
+                        null=True,
+                        verbose_name="Is the participant willing to schedule an appointment",
+                    ),
+                ),
+                (
+                    "appt_reason_unwilling",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("not_interested", "Not interested in participating"),
+                            ("busy", "Busy during the suggested times"),
+                            ("away", "Out of town during the suggested times"),
+                            ("unavailable", "Not available during the suggested times"),
+                            ("DWTA", "Prefer not to say why I am unwilling."),
+                            ("OTHER", "Other reason ..."),
+                        ],
+                        max_length=25,
+                        null=True,
+                        verbose_name="What is the reason the participant is unwilling to schedule an appointment",
+                    ),
+                ),
+                (
+                    "appt_reason_unwilling_other",
+                    models.CharField(
+                        blank=True,
+                        max_length=50,
+                        null=True,
+                        verbose_name="Other reason, please specify ...",
+                    ),
+                ),
+                (
+                    "appt_date",
+                    models.DateField(
+                        blank=True,
+                        help_text="This can only come from the participant.",
+                        null=True,
+                        validators=[edc_model.validators.date.date_is_future],
+                        verbose_name="Appointment Date",
+                    ),
+                ),
+                (
+                    "appt_grading",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("firm", "Firm appointment"),
+                            ("weak", "Possible appointment"),
+                            ("guess", "Estimated by RA"),
+                        ],
+                        max_length=25,
+                        null=True,
+                        verbose_name="Is this appointment...",
+                    ),
+                ),
+                (
+                    "appt_location",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("home", "At home"),
+                            ("work", "At work"),
+                            ("telephone", "By telephone"),
+                            ("clinic", "At clinic"),
+                            ("OTHER", "Other location"),
+                        ],
+                        max_length=50,
+                        null=True,
+                        verbose_name="Appointment location",
+                    ),
+                ),
+                (
+                    "appt_location_other",
+                    edc_model_fields.fields.other_charfield.OtherCharField(
+                        blank=True,
+                        max_length=50,
+                        null=True,
+                        verbose_name="Other location, please specify ...",
+                    ),
+                ),
+                ("delivered", models.BooleanField(default=False, editable=False)),
+                (
+                    "may_call",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("Yes", "Yes, we may continue to contact the participant."),
+                            ("No", "No, participant has asked NOT to be contacted again."),
+                        ],
+                        default="Yes",
+                        max_length=10,
+                        null=True,
+                        verbose_name="May we continue to contact the participant?",
+                    ),
+                ),
+                (
+                    "log",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="edc_call_manager.log"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Log Entry',
-                'verbose_name_plural': 'Log Entries',
-                'abstract': False,
-                'unique_together': {('call_datetime', 'log')},
+                "verbose_name": "Log Entry",
+                "verbose_name_plural": "Log Entries",
+                "abstract": False,
+                "unique_together": {("call_datetime", "log")},
             },
             managers=[
-                ('objects', edc_call_manager.managers.LogEntryManager()),
+                ("objects", edc_call_manager.managers.LogEntryManager()),
             ],
         ),
     ]

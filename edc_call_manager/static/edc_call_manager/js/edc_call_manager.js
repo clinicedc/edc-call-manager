@@ -13,7 +13,7 @@ function updateAppointment() {
     showApptReasonUnwilling();
     hideOtherApptReasonUnwilling();
     hideAppointment();
-    hideOtherLocation();    
+    hideOtherLocation();
   } else {
     hideApptReasonUnwilling();
     hideOtherApptReasonUnwilling();
@@ -29,13 +29,13 @@ function updateAppointment() {
       showApptReasonUnwilling();
       hideOtherApptReasonUnwilling();
       hideAppointment();
-      hideOtherLocation();    
+      hideOtherLocation();
     } else {
       hideApptReasonUnwilling();
       hideOtherApptReasonUnwilling();
     	hideAppointment();
     	hideOtherLocation();
-    }        
+    }
   });
 
 }
@@ -53,7 +53,7 @@ function updateOtherLocation() {
 	  	showOtherLocation();
     } else {
     	hideOtherLocation();
-    }        
+    }
   });
 }
 
@@ -70,7 +70,7 @@ function updateOtherApptReasonUnwilling() {
       showOtherApptReasonUnwilling();
     } else {
       hideOtherApptReasonUnwilling();
-    }        
+    }
   });
 }
 
@@ -145,38 +145,38 @@ function hideContact() {
     $('#id_appt').prop( "required", false ).val('');
     $('#id_time_of_week').prop( "required", false ).val('');
     $('#id_time_of_day').prop( "required", false ).val('');
-    $('#id_may_call').prop( "required", false ).val('');	
+    $('#id_may_call').prop( "required", false ).val('');
 }
 
 function showAppointment() {
     $('#div_id_appt_date').show();
-    $('#div_id_appt_grading').show();  
+    $('#div_id_appt_grading').show();
     $('#div_id_appt_location').show();
     $('#id_appt_date').prop( "required", true );
-    $('#id_appt_grading').prop( "required", true );  
+    $('#id_appt_grading').prop( "required", true );
     $('#id_appt_location').prop( "required", true );
-    $('#id_appt_other_location').prop( "required", false ).val('');	
+    $('#id_appt_other_location').prop( "required", false ).val('');
 }
 
 function hideAppointment() {
-    $('#div_id_appt_date').hide();  
-    $('#div_id_appt_grading').hide();  
+    $('#div_id_appt_date').hide();
+    $('#div_id_appt_grading').hide();
     $('#div_id_appt_location').hide();
     $('#div_id_appt_location_other').hide();
     $('#id_appt_date').prop( "required", false ).val('');
-    $('#id_appt_grading').prop( "required", false ).val('');  
-    $('#id_appt_location').prop( "required", false ).val('');	
-    $('#id_appt_other_location').prop( "required", false ).val('');	
+    $('#id_appt_grading').prop( "required", false ).val('');
+    $('#id_appt_location').prop( "required", false ).val('');
+    $('#id_appt_other_location').prop( "required", false ).val('');
 }
 
 function showOtherLocation() {
     $('#div_id_appt_location_other').show();
-    $('#id_appt_location_other').prop( "required", true );  
+    $('#id_appt_location_other').prop( "required", true );
 }
 
 function hideOtherLocation() {
     $('#div_id_appt_location_other').hide();
-    $('#id_appt_location_other').prop( "required", false ).val('');  
+    $('#id_appt_location_other').prop( "required", false ).val('');
 }
 
 function showApptReasonUnwilling() {
@@ -191,10 +191,10 @@ function hideApptReasonUnwilling() {
 
 function showOtherApptReasonUnwilling() {
     $('#div_id_appt_reason_unwilling_other').show();
-    $('#id_appt_reason_unwilling_other').prop( "required", true );  
+    $('#id_appt_reason_unwilling_other').prop( "required", true );
 }
 
 function hideOtherApptReasonUnwilling() {
     $('#div_id_appt_reason_unwilling_other').hide();
-    $('#id_appt_reason_unwilling_other').prop( "required", false ).val('');  
+    $('#id_appt_reason_unwilling_other').prop( "required", false ).val('');
 }

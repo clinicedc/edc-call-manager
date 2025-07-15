@@ -52,7 +52,7 @@
             {% elif contact_information.may_follow_up == 'No' %}
                 May not follow.
             {% else %}
-                {{ contact_information|default:'not contact information' }}        
+                {{ contact_information|default:'not contact information' }}
             {% endif %}
         </div>
 
@@ -65,7 +65,7 @@
                     <li role="presentation">{{ contact_information.contact_relation|default:'relation unknown' }}</li>
                 </ul>
             {% else %}
-                {{ contact_information.contact_name|default:'<i>unavailable</i>' }}        
+                {{ contact_information.contact_name|default:'<i>unavailable</i>' }}
             {% endif %}
             </div>
 
@@ -93,7 +93,7 @@
             {% endfor %}
         {% else %}
             not yet contacted
-        {% endif %} 
+        {% endif %}
         </ul>
         </div>
     </div>    <!-- div-contact-history -->
@@ -113,15 +113,15 @@
 $(document).ready( function () {
 
   setFormControls();
-    
+
   updateContacted();
-    
+
   updateAppointment();
-  
+
   updateOtherLocation();
-  
+
   updateOtherApptReasonUnwilling();
-    
+
   if ('{{ do_not_call }}' == 'True') {
     $('#id-do-not-call-warning').show();
   } else {
@@ -146,7 +146,6 @@ function setFormControls() {
   if ( '{{ call_closed }}' == 'True'){
     $('#id-call-closed').show();
   };
-}    
-</script>    
+}
+</script>
 {% endblock extra-scripts-bottom %}
-    

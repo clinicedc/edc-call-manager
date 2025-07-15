@@ -32,26 +32,26 @@ When the mother delivers we complete the `PostNatalEnrollment` model and this ca
 Here is an example `ModelCaller` start model:
 
 	class AnteNatalEnrollment(models.Model):
-	
+
 	    subject_identifier = models.CharField(
 	        max_length=25)
-	
+
 	    subject_date = models.DateField(
 	        default=datetime.now())
-	
+
 	    class Meta:
 	        app_label = 'my_app'
 
 ... and stop model:
 
 	class PostNatalEnrollment(models.Model):
-	
+
 	    subject_identifier = models.CharField(
 	        max_length=25)
-	
+
 	    subject_date = models.DateField(
 	        default=datetime.now())
-	
+
 	    class Meta:
 	        app_label = 'my_app'
 

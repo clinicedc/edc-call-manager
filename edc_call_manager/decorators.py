@@ -7,8 +7,8 @@ def register(start_model, stop_model=None, **kwargs):
     class AntenatalModelCaller(ModelCaller):
         pass
     """
-    from .model_caller import ModelCaller
     from .caller_site import site_model_callers
+    from .model_caller import ModelCaller
 
     def _model_caller_wrapper(caller_class):
 

@@ -1,10 +1,8 @@
 import jsonpickle
-
 from django.apps import apps as django_apps
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import UpdateView, DeleteView, CreateView
-
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from edc_constants.constants import ALIVE
 from edc_dashboard.view_mixins import EdcViewMixin
 from edc_protocol.view_mixins import EdcProtocolViewMixin
@@ -27,11 +25,7 @@ class HomeView(EdcViewMixin, EdcProtocolViewMixin, TemplateView):
         context.update({"model_callers": site_model_callers.model_callers.values()})
         if app_config.verbose_name not in context.get("project_name"):
             context.update(
-                {
-                    "project_name": context.get("project_name")
-                    + ": "
-                    + app_config.verbose_name
-                }
+                {"project_name": context.get("project_name") + ": " + app_config.verbose_name}
             )
         context.update({"app_label": app_config.app_label})
         context.update({"context": jsonpickle.encode(context)})
